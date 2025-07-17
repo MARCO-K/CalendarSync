@@ -1,0 +1,106 @@
+name: PowerShell Module Validation
+
+on:
+    push:
+        branches: [main, develop]
+    pull_request:
+        branches: [main]
+
+jobs:
+    validate:
+        runs-on: windows-latest
+
+        steps:
+            - uses: actions/checkout@v3
+
+            - name: Setup PowerShell
+              uses: actions/setup-powershell@v1
+              with:
+                  powershell-version: '5.1'
+
+            - name: Install Required Modules
+              run: |
+                  Install-Module PSFramework -Force -Scope CurrentUser
+                  Install-Module Microsoft.Graph -Force -Scope CurrentUser
+              shell: powershell
+
+            - name: Test Module Import
+              run: |
+                  Import-Module .\CalendarSync -Force
+                  Get-Command -Module CalendarSync
+              shell: powershell
+
+            - name: Test Module Help
+              run: |
+                  Import-Module .\CalendarSync -Force
+                  Get-Help Sync-CalendarEvents -Examples
+                  Get-Help Connect-ToMicrosoftGraph -Examples
+              shell: powershell
+
+            - name: Validate Module Manifest
+              run: |
+                  Test-ModuleManifest .\CalendarSync\CalendarSync.psd1
+              shell: powershell
+
+            - name: Check for Syntax Errors
+              run: |
+                  $ErrorCount = 0
+                  Get-ChildItem -Path .\CalendarSync -Recurse -Filter "*.ps1" | ForEach-Object {
+                    $Content = Get-Content $_.FullName -Raw
+                    $Tokens = $null
+                    $ParseErrors = $null
+                    $null = [System.Management.Automation.PSParser]::Tokenize($Content, [ref]$Tokens, [ref]$ParseErrors)
+                    if ($ParseErrors) {
+                      Write-Host "Parse errors in $($_.FullName):" -ForegroundColor Red
+                      $ParseErrors | ForEach-Object { Write-Host "  $($_.Message)" -ForegroundColor Red }
+                      $ErrorCount++
+                    }
+                  }
+                  if ($ErrorCount -gt 0) {
+                    Write-Host "Found $ErrorCount files with parse errors" -ForegroundColor Red
+                    exit 1
+                  } else {
+                    Write-Host "No syntax errors found" -ForegroundColor Green
+                  }
+              shell: powershell
+
+            - name: Check Code Quality
+              run: |
+                  # Check for basic code quality issues
+                  $IssueCount = 0
+                  Get-ChildItem -Path .\CalendarSync -Recurse -Filter "*.ps1" | ForEach-Object {
+                    $Content = Get-Content $_.FullName -Raw
+                    
+                    # Check for Write-Host usage (should use Write-PSFMessage)
+                    if ($Content -match "Write-Host") {
+                      Write-Warning "File $($_.Name) contains Write-Host usage"
+                      $IssueCount++
+                    }
+                    
+                    # Check for proper error handling
+                    if ($Content -match "function\s+\w+" -and $Content -notmatch "try\s*{") {
+                      Write-Warning "File $($_.Name) may be missing try/catch blocks"
+                      $IssueCount++
+                    }
+                  }
+
+                  if ($IssueCount -gt 0) {
+                    Write-Host "Found $IssueCount code quality issues" -ForegroundColor Yellow
+                  } else {
+                    Write-Host "No code quality issues found" -ForegroundColor Green
+                  }
+              shell: powershell
+
+    lint:
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v3
+
+            - name: Lint Markdown files
+              uses: nosborn/github-action-markdown-cli@v3.2.0
+              with:
+                  files: '**/*.md'
+                  config_file: '.markdownlint.json'
+                  ignore_files: 'CHANGELOG.md'
+                  ignore_path: '.gitignore'

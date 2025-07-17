@@ -1,0 +1,109 @@
+# PowerShell
+*.ps1xml
+*.psd1.bak
+*.psm1.bak
+
+# Results and Output Files
+calendarSync_results_*.json
+*.log
+*.tmp
+
+# Configuration Files (if containing sensitive data)
+# config.json
+
+# IDE and Editor Files
+.vscode/
+.vs/
+*.swp
+*.swo
+*~
+
+# OS Files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Temporary Files
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# Windows
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msm
+*.msp
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# Node.js (if using any Node-based tools)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Python (if using any Python tools)
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Test Results
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+
+# Personal Files
+personal/
+private/
+secrets/
+*.secret
+*.key
+*.pem
+*.p12
+*.pfx
+
+# Session Files
+Session_*.md
+
+# GitHub Specific
+.github/workflows/secrets.yml
