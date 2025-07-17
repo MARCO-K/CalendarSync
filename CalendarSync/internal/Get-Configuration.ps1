@@ -1,4 +1,4 @@
-function Get-Configuration
+﻿function Get-Configuration
 {
     <#
     .SYNOPSIS
@@ -11,12 +11,13 @@ function Get-Configuration
         Get-Configuration -ConfigPath ".\config.json"
     #>
     [CmdletBinding()]
+    [OutputType([hashtable])]
     param(
         [string]$ConfigPath
     )
-    
+
     $config = $null
-    
+
     if ($ConfigPath -and (Test-Path $ConfigPath))
     {
         try
@@ -37,12 +38,12 @@ function Get-Configuration
         $config = $DefaultConfig
         Write-PSFMessage -Level Verbose -Message "Using default configuration"
     }
-    
+
     # Validate configuration
     if (-not (Test-Configuration -Config $config))
     {
         throw "Configuration validation failed"
     }
-    
+
     return $config
 }

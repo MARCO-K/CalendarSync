@@ -1,4 +1,4 @@
-function Test-Configuration
+﻿function Test-Configuration
 {
     <#
     .SYNOPSIS
@@ -11,20 +11,21 @@ function Test-Configuration
         Test-Configuration -Config $config
     #>
     [CmdletBinding()]
+    [OutputType([bool])]
     param(
         [Parameter(Mandatory = $true)]
         [object]$Config
     )
-    
+
     $isValid = $true
-    
+
     # Check required SharePoint properties
     if (-not $Config.SharePoint -or -not $Config.SharePoint.ListID -or -not $Config.SharePoint.SiteID)
     {
         Write-PSFMessage -Level Error -Message "Invalid configuration: SharePoint.ListID and SharePoint.SiteID are required"
         $isValid = $false
     }
-    
+
     # Check required FieldMappings
     $requiredFields = @('Title', 'Description', 'StartDate', 'EndDate', 'Location')
     foreach ($field in $requiredFields)
@@ -35,18 +36,18 @@ function Test-Configuration
             $isValid = $false
         }
     }
-    
+
     # Check DateRange values
     if ($Config.DateRange.FutureDays -lt 1 -or $Config.DateRange.FutureDays -gt 365)
     {
         Write-PSFMessage -Level Error -Message "Invalid configuration: DateRange.FutureDays must be between 1 and 365"
         $isValid = $false
     }
-    
+
     if ($isValid)
     {
         Write-PSFMessage -Level Debug -Message "Configuration validation passed"
     }
-    
+
     return $isValid
 }

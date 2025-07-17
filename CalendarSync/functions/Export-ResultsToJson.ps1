@@ -1,4 +1,4 @@
-function Export-ResultsToJson {
+﻿function Export-ResultsToJson {
     <#
     .SYNOPSIS
         Exports event results to JSON file
@@ -12,11 +12,12 @@ function Export-ResultsToJson {
         Export-ResultsToJson -Events $formattedEvents -OutputPath "C:\Results"
     #>
     [CmdletBinding()]
+    [OutputType([void])]
     param(
         [array]$Events,
         [string]$OutputPath
     )
-    
+
     try {
         $outputFile = Join-Path $OutputPath "calendarSync_results_$(Get-Date -Format 'yyyyMMdd_HHmmss').json"
         $Events | ConvertTo-Json -Depth 10 | Out-File -FilePath $outputFile -Encoding UTF8

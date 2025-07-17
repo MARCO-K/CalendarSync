@@ -1,4 +1,4 @@
-function ConvertTo-FormattedEvents {
+﻿function ConvertTo-FormattedEvent {
     <#
     .SYNOPSIS
         Converts SharePoint list items to formatted event objects
@@ -9,48 +9,49 @@ function ConvertTo-FormattedEvents {
     .PARAMETER FieldMappings
         Hashtable mapping field names to SharePoint field names
     .EXAMPLE
-        ConvertTo-FormattedEvents -Items $items -FieldMappings $config.FieldMappings
+        ConvertTo-FormattedEvent -Items $items -FieldMappings $config.FieldMappings
     #>
     [CmdletBinding()]
+    [OutputType([array])]
     param(
         [Parameter(Mandatory = $true)]
         [array]$Items,
-        
+
         [Parameter(Mandatory = $true)]
         [hashtable]$FieldMappings
     )
-    
+
     $formattedEvents = @()
-    
+
     foreach ($item in $Items) {
         try {
             $fields = $item.Fields.AdditionalProperties
-            
+
             # Debug output for field discovery
             if ($DebugMode) {
                 Write-PSFMessage -Level Debug -Message "Processing Item ID: $($item.Id)"
                 Write-PSFMessage -Level Debug -Message "Available fields: $($fields.Keys -join ', ')"
             }
-            
+
             # Create formatted event with safe field access
             $rawStartDate = Get-SafeFieldValue -Fields $fields -FieldName $FieldMappings.StartDate
             $rawEndDate = Get-SafeFieldValue -Fields $fields -FieldName $FieldMappings.EndDate
-            
+
             # Extract event times from location
             $location = Get-SafeFieldValue -Fields $fields -FieldName $FieldMappings.Location
-            $eventTimes = Get-EventTimes -LocationString $location
-            
+            $eventTimes = Get-EventTime -LocationString $location
+
             # Clean HTML content from Description
             $rawDescription = Get-SafeFieldValue -Fields $fields -FieldName $FieldMappings.Description
             $cleanDescription = Convert-HtmlToText -HtmlContent $rawDescription
-            
+
             # Extract trainer information from subject
             $subject = Get-SafeFieldValue -Fields $fields -FieldName $FieldMappings.Title
             $trainer = Get-TrainerInfo -SubjectString $subject
-            
+
             # Determine location type
             $locationType = Get-LocationType -LocationString $location
-            
+
             $formattedEvents += [PSCustomObject]@{
                 Id           = $item.Id
                 Subject      = $subject
@@ -63,15 +64,15 @@ function ConvertTo-FormattedEvents {
                 LocationType = $locationType
                 Trainer      = $trainer
             }
-            
+
         }
         catch {
             Write-PSFMessage -Level Error -Message "Error processing item $($item.Id): $($_.Exception.Message)"
             Write-PSFMessage -Level Debug -Message "Stack trace: $($_.ScriptStackTrace)"
         }
     }
-    
+
     Write-PSFMessage -Level Verbose -Message "Successfully processed $($formattedEvents.Count) events"
-    
+
     return $formattedEvents
 }

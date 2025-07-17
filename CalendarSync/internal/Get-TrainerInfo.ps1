@@ -1,4 +1,4 @@
-function Get-TrainerInfo {
+﻿function Get-TrainerInfo {
     <#
     .SYNOPSIS
         Extracts trainer information from subject strings
@@ -10,16 +10,17 @@ function Get-TrainerInfo {
         Get-TrainerInfo -SubjectString "PowerBI Grundlagen - Trainer: Jan Trummel"
     #>
     [CmdletBinding()]
+    [OutputType([string])]
     param(
         [Parameter(Mandatory = $true)]
         [AllowEmptyString()]
         [string]$SubjectString
     )
-    
+
     if ([string]::IsNullOrEmpty($SubjectString)) {
         return $null
     }
-    
+
     try {
         # Pattern to match "Trainer: Name" or "Trainer von Name"
         if ($SubjectString -match 'Trainer:\s*([^-]+?)(?:\s*$|$)') {

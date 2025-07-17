@@ -1,4 +1,4 @@
-function Get-SafeFieldValue
+﻿function Get-SafeFieldValue
 {
     <#
     .SYNOPSIS
@@ -13,11 +13,12 @@ function Get-SafeFieldValue
         Get-SafeFieldValue -Fields $item.Fields -FieldName "Title"
     #>
     [CmdletBinding()]
+    [OutputType([string])]
     param(
         [hashtable]$Fields,
         [string]$FieldName
     )
-    
+
     if ($Fields.ContainsKey($FieldName))
     {
         return $Fields[$FieldName]

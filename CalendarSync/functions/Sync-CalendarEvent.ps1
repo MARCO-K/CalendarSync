@@ -1,4 +1,4 @@
-function Sync-CalendarEvents {
+﻿function Sync-CalendarEvent {
     <#
     .SYNOPSIS
         Synchronizes calendar events from SharePoint lists
@@ -12,11 +12,12 @@ function Sync-CalendarEvents {
     .PARAMETER DebugMode
         Enable debug output and detailed logging
     .EXAMPLE
-        Sync-CalendarEvents -DebugMode
+        Sync-CalendarEvent -DebugMode
     .EXAMPLE
-        Sync-CalendarEvents -ConfigPath ".\config.json" -OutputPath ".\results\"
+        Sync-CalendarEvent -ConfigPath ".\config.json" -OutputPath ".\results\"
     #>
     [CmdletBinding()]
+    [OutputType([void])]
     param(
         [ValidateScript({
             if ([string]::IsNullOrEmpty($_)) { return $true }
@@ -25,7 +26,7 @@ function Sync-CalendarEvents {
             return $true
         })]
         [string]$ConfigPath = "",
-        
+
         [ValidateScript({
             if ([string]::IsNullOrEmpty($_)) { return $true }
             $parent = Split-Path -Parent $_
@@ -33,66 +34,66 @@ function Sync-CalendarEvents {
             return $true
         })]
         [string]$OutputPath = "",
-        
+
         [switch]$DebugMode = $false
     )
-    
+
     try {
         # Initialize logging
         Write-PSFMessage -Level Verbose -Message "=== Calendar Sync Process Started ==="
-        
+
         # Load configuration
         $Config = Get-Configuration -ConfigPath $ConfigPath
-        
+
         # Connect to Microsoft Graph
         if (-not (Connect-ToMicrosoftGraph)) {
             throw "Failed to establish Microsoft Graph connection"
         }
-        
+
         # Calculate date range for upcoming week
         $startDateObj = Get-Date -Hour 0 -Minute 0 -Second 0 -Millisecond 0  # Start of today
         $endDateObj = $startDateObj.AddDays($Config.DateRange.FutureDays).AddHours(23).AddMinutes(59).AddSeconds(59)  # End of 7th day
         $startDate = $startDateObj.ToString("yyyy-MM-ddTHH:mm:ssZ")
         $endDate = $endDateObj.ToString("yyyy-MM-ddTHH:mm:ssZ")
-        
+
         Write-PSFMessage -Level Verbose -Message "Upcoming week date range: $startDate to $endDate"
-        
+
         # Build filter string for upcoming week (both start and end constraints)
         $filterString = "fields/$($Config.FieldMappings.StartDate) ge '$startDate' and fields/$($Config.FieldMappings.StartDate) le '$endDate'"
-        
+
         # Get SharePoint list items
-        $events = Get-SharePointListItems -SiteID $Config.SharePoint.SiteID -ListID $Config.SharePoint.ListID -FilterString $filterString -StartDate $startDateObj -EndDate $endDateObj -DateFieldName $Config.FieldMappings.StartDate -FilterConfig $Config.Filtering
-        
+        $events = Get-SharePointListItem -SiteID $Config.SharePoint.SiteID -ListID $Config.SharePoint.ListID -FilterString $filterString -StartDate $startDateObj -EndDate $endDateObj -DateFieldName $Config.FieldMappings.StartDate -FilterConfig $Config.Filtering
+
         # Process and format events
-        $formattedEvents = ConvertTo-FormattedEvents -Items $events -FieldMappings $Config.FieldMappings
-        
+        $formattedEvents = ConvertTo-FormattedEvent -Items $events -FieldMappings $Config.FieldMappings
+
         # Export results if events found
         if ($formattedEvents.Count -gt 0) {
-            $outputPath = if ($OutputPath) { 
-                $OutputPath 
+            $outputPath = if ($OutputPath) {
+                $OutputPath
             }
-            else { 
-                $scriptPath = if ($MyInvocation.ScriptName) { 
-                    Split-Path -Parent $MyInvocation.ScriptName 
+            else {
+                $scriptPath = if ($MyInvocation.ScriptName) {
+                    Split-Path -Parent $MyInvocation.ScriptName
                 }
-                else { 
-                    Get-Location 
+                else {
+                    Get-Location
                 }
                 $scriptPath
             }
             Export-ResultsToJson -Events $formattedEvents -OutputPath $outputPath
         }
-        
+
         # Output results
         Write-PSFMessage -Level Verbose -Message "=== SYNC RESULTS ==="
         Write-PSFMessage -Level Verbose -Message "Total events processed: $($formattedEvents.Count)"
-        
+
         if ($DebugMode -and $formattedEvents.Count -gt 0) {
             Write-PSFMessage -Level Debug -Message "=== DEBUG: First 3 Events ==="
             $debugOutput = $formattedEvents | Select-Object -First 3 | Format-List | Out-String
             Write-PSFMessage -Level Debug -Message $debugOutput
         }
-        
+
         # Return formatted events for further processing only if not writing to JSON
         if (-not $OutputPath) {
             return $formattedEvents

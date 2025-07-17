@@ -1,4 +1,4 @@
-function Get-LocationType {
+﻿function Get-LocationType {
     <#
     .SYNOPSIS
         Determines the location type based on location string
@@ -10,14 +10,15 @@ function Get-LocationType {
         Get-LocationType -LocationString "Online via Teams"
     #>
     [CmdletBinding()]
+    [OutputType([string])]
     param(
         [string]$LocationString
     )
-    
+
     if ([string]::IsNullOrEmpty($LocationString)) {
         return "vor Ort"
     }
-    
+
     try {
         # Check for Netz-Weise location
         if ($LocationString -match "Netz-Weise") {

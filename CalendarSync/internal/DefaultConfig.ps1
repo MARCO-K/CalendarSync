@@ -1,4 +1,4 @@
-# Default configuration for CalendarSync module
+﻿# Default configuration for CalendarSync module
 $script:DefaultConfig = @{
     SharePoint    = @{
         ListID = '7ee97012-82fa-4c24-a127-3d774f3bdd3c'

@@ -1,4 +1,4 @@
-function Connect-ToMicrosoftGraph {
+﻿function Connect-ToMicrosoftGraph {
     <#
     .SYNOPSIS
         Connects to Microsoft Graph API
@@ -12,21 +12,22 @@ function Connect-ToMicrosoftGraph {
         Connect-ToMicrosoftGraph -MaxRetries 5 -RetryDelaySeconds 10
     #>
     [CmdletBinding()]
+    [OutputType([bool])]
     param(
         [int]$MaxRetries = 3,
         [int]$RetryDelaySeconds = 5
     )
-    
+
     try {
         Write-PSFMessage -Level Verbose -Message "Connecting to Microsoft Graph..."
-        
+
         # Check if already connected
         $context = Get-MgContext -ErrorAction SilentlyContinue
         if ($context) {
             Write-PSFMessage -Level Verbose -Message "Already connected to Microsoft Graph as: $($context.Account)"
             return $true
         }
-        
+
         # Retry logic for connection
         for ($i = 1; $i -le $MaxRetries; $i++) {
             try {
@@ -36,16 +37,16 @@ function Connect-ToMicrosoftGraph {
             }
             catch {
                 Write-PSFMessage -Level Warning -Message "Connection attempt $i failed: $($_.Exception.Message)"
-                
+
                 if ($i -eq $MaxRetries) {
                     throw
                 }
-                
+
                 Write-PSFMessage -Level Verbose -Message "Retrying in $RetryDelaySeconds seconds..."
                 Start-Sleep -Seconds $RetryDelaySeconds
             }
         }
-        
+
         return $false
     }
     catch {

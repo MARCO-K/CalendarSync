@@ -1,4 +1,4 @@
-@{
+﻿@{
     # Script module or binary module file associated with this manifest.
     RootModule        = 'CalendarSync.psm1'
 
@@ -32,10 +32,10 @@
 
     # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
     FunctionsToExport = @(
-        'Sync-CalendarEvents',
+        'Sync-CalendarEvent',
         'Connect-ToMicrosoftGraph',
-        'Get-SharePointListItems',
-        'ConvertTo-FormattedEvents',
+        'Get-SharePointListItem',
+        'ConvertTo-FormattedEvent',
         'Export-ResultsToJson'
     )
 

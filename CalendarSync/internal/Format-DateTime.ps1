@@ -1,4 +1,4 @@
-function Format-DateTime
+﻿function Format-DateTime
 {
     <#
     .SYNOPSIS
@@ -8,32 +8,35 @@ function Format-DateTime
     .PARAMETER DateTimeString
         String containing the datetime to format
     .PARAMETER ShortFormat
-        Use short format for output
+        Use short format for output (dd.MM.yy instead of dd.MM.yyyy)
     .PARAMETER Format
         Custom format string (default: dd.MM.yyyy)
     .EXAMPLE
         Format-DateTime -DateTimeString "2025-07-17T09:00:00Z"
+    .EXAMPLE
+        Format-DateTime -DateTimeString "2025-07-17T09:00:00Z" -ShortFormat
     #>
     [CmdletBinding()]
+    [OutputType([string])]
     param(
         [Parameter(Mandatory = $true)]
         [AllowEmptyString()]
         [string]$DateTimeString,
-        
+
         [switch]$ShortFormat,
-        
+
         [string]$Format = "dd.MM.yyyy"
     )
-    
+
     if ([string]::IsNullOrEmpty($DateTimeString))
     {
         return $null
     }
-    
+
     try
     {
         $dateTime = $null
-        
+
         # Handle ISO 8601 format with Z suffix (UTC)
         if ($DateTimeString -match '^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z?$')
         {
@@ -49,14 +52,24 @@ function Format-DateTime
             Write-PSFMessage -Level Warning -Message "Unable to parse datetime format: $DateTimeString"
             return $DateTimeString
         }
-        
+
         # Convert to local time if UTC
         if ($dateTime.Kind -eq [DateTimeKind]::Utc)
         {
             $dateTime = $dateTime.ToLocalTime()
         }
-        
-        return $dateTime.ToString($Format)
+
+        # Use short format if requested
+        if ($ShortFormat)
+        {
+            $outputFormat = "dd.MM.yy"
+        }
+        else
+        {
+            $outputFormat = $Format
+        }
+
+        return $dateTime.ToString($outputFormat)
     }
     catch
     {
