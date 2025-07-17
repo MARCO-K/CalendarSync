@@ -10,10 +10,10 @@ CalendarSync/
 ├── CalendarSync.psd1          # Module manifest
 ├── CalendarSync.psm1          # Main module file
 ├── functions/                 # Public functions
-│   ├── Sync-CalendarEvents.ps1
+│   ├── Sync-CalendarEvent.ps1
 │   ├── Connect-ToMicrosoftGraph.ps1
-│   ├── Get-SharePointListItems.ps1
-│   ├── ConvertTo-FormattedEvents.ps1
+│   ├── Get-SharePointListItem.ps1
+│   ├── ConvertTo-FormattedEvent.ps1
 │   └── Export-ResultsToJson.ps1
 └── internal/                  # Helper functions
     ├── DefaultConfig.ps1
@@ -64,23 +64,23 @@ CalendarSync/
 Import-Module CalendarSync
 
 # Run synchronization
-Sync-CalendarEvents
+Sync-CalendarEvent
 
 # Run with debug mode
-Sync-CalendarEvents -DebugMode
+Sync-CalendarEvent -DebugMode
 ```
 
 ### Advanced Usage
 
 ```powershell
 # Use external configuration file
-Sync-CalendarEvents -ConfigPath ".\config.json"
+Sync-CalendarEvent -ConfigPath ".\config.json"
 
 # Specify output directory
-Sync-CalendarEvents -OutputPath ".\results\"
+Sync-CalendarEvent -OutputPath ".\results\"
 
 # Get events programmatically (without file output)
-$events = Sync-CalendarEvents -OutputPath $null
+$events = Sync-CalendarEvent -OutputPath $null
 ```
 
 ### Individual Function Usage
@@ -90,10 +90,10 @@ $events = Sync-CalendarEvents -OutputPath $null
 Connect-ToMicrosoftGraph
 
 # Get SharePoint list items
-$items = Get-SharePointListItems -SiteID $siteId -ListID $listId -FilterString $filter
+$items = Get-SharePointListItem -SiteID $siteId -ListID $listId -FilterString $filter
 
 # Convert to formatted events
-$events = ConvertTo-FormattedEvents -Items $items -FieldMappings $mappings
+$events = ConvertTo-FormattedEvent -Items $items -FieldMappings $mappings
 
 # Export to JSON
 Export-ResultsToJson -Events $events -OutputPath ".\output"
@@ -101,7 +101,7 @@ Export-ResultsToJson -Events $events -OutputPath ".\output"
 
 ## Public Functions
 
-### Sync-CalendarEvents
+### Sync-CalendarEvent
 
 Main function that orchestrates the entire synchronization process.
 
@@ -120,7 +120,7 @@ Establishes connection to Microsoft Graph API with retry logic.
 - `MaxRetries` - Maximum connection attempts (default: 3)
 - `RetryDelaySeconds` - Delay between retries (default: 5)
 
-### Get-SharePointListItems
+### Get-SharePointListItem
 
 Retrieves SharePoint list items with filtering support.
 
@@ -134,7 +134,7 @@ Retrieves SharePoint list items with filtering support.
 - `DateFieldName` - Date field name for filtering
 - `FilterConfig` - Filtering configuration
 
-### ConvertTo-FormattedEvents
+### ConvertTo-FormattedEvent
 
 Converts SharePoint items to formatted event objects.
 

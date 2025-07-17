@@ -3,7 +3,7 @@
     RootModule        = 'CalendarSync.psm1'
 
     # Version number of this module.
-    ModuleVersion     = '1.0.0'
+    ModuleVersion     = '1.0.1'
 
     # ID used to uniquely identify this module
     GUID              = 'b9c85b6d-4f6e-4a8d-9c7e-8f1a2b3c4d5e'

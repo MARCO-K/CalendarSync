@@ -5,6 +5,24 @@ All notable changes to the CalendarSync PowerShell module will be documented in 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2025-07-17
+
+### Fixed
+- **PowerShell Best Practices Compliance**: Fixed all PSScriptAnalyzer Warning and Error issues
+- **Function Names**: Renamed functions to use singular nouns per PowerShell conventions:
+  - `ConvertTo-FormattedEvents` → `ConvertTo-FormattedEvent`
+  - `Get-SharePointListItems` → `Get-SharePointListItem`
+  - `Sync-CalendarEvents` → `Sync-CalendarEvent`
+  - `Get-EventTimes` → `Get-EventTime`
+- **Format-DateTime Function**: Implemented missing `ShortFormat` parameter functionality
+- **OutputType Attributes**: Added proper `[OutputType()]` attributes to all functions
+- **Code Quality**: Removed all trailing whitespace throughout the codebase
+
+### Changed
+- Updated module manifest to reflect new function names
+- Updated all internal function calls to use new names
+- Updated documentation to reflect renamed functions
+
 ## [1.0.0] - 2025-07-17
 
 ### Added
