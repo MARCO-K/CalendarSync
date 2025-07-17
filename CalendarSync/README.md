@@ -1,6 +1,7 @@
 # CalendarSync PowerShell Module
 
-A modular PowerShell module for synchronizing calendar events between Microsoft Graph API and SharePoint lists with enhanced error handling, logging, and configuration management.
+A modular PowerShell module for synchronizing calendar events between Microsoft Graph API and SharePoint lists with
+enhanced error handling, logging, and configuration management.
 
 ## Module Structure
 
@@ -190,7 +191,8 @@ The module uses a default configuration that can be overridden with a JSON file:
 
 ## Compatibility
 
-A compatibility script (`CalendarSync-New.ps1`) is provided that mimics the original script behavior while using the modular functions underneath.
+A compatibility script (`CalendarSync-New.ps1`) is provided that mimics the original script behavior while using the
+modular functions underneath.
 
 ## Error Handling
 

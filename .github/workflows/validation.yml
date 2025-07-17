@@ -13,11 +13,6 @@ jobs:
         steps:
             - uses: actions/checkout@v3
 
-            - name: Setup PowerShell
-              uses: actions/setup-powershell@v1
-              with:
-                  powershell-version: '5.1'
-
             - name: Install Required Modules
               run: |
                   Install-Module PSFramework -Force -Scope CurrentUser
