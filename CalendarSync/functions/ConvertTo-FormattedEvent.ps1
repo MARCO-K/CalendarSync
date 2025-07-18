@@ -42,6 +42,50 @@
             $rawStartDate = Get-SafeFieldValue -Fields $fields -FieldName $FieldMappings.StartDate
             $rawEndDate = Get-SafeFieldValue -Fields $fields -FieldName $FieldMappings.EndDate
 
+            # Detect and correct single-day events
+            # SharePoint sometimes sets EndDate to next day instead of same day for single-day events
+            if (-not [string]::IsNullOrEmpty($rawStartDate) -and -not [string]::IsNullOrEmpty($rawEndDate))
+            {
+                try
+                {
+                    $startDateTime = [DateTime]::Parse($rawStartDate, [System.Globalization.CultureInfo]::InvariantCulture)
+                    $endDateTime = [DateTime]::Parse($rawEndDate, [System.Globalization.CultureInfo]::InvariantCulture)
+                    
+                    # Only correct if end date is exactly one day after start date
+                    # AND this looks like a single-day event incorrectly spanning to next day
+                    if ($endDateTime.Date -eq $startDateTime.Date.AddDays(1))
+                    {
+                        # Check if this looks like a single-day event that was incorrectly set:
+                        # - Start time is typically morning (6:00-12:00)
+                        # - End time is typically afternoon/evening (12:00-18:00)
+                        # - The difference between start and end times (ignoring date) suggests a single working day
+                        $startHour = $startDateTime.Hour
+                        $endHour = $endDateTime.Hour
+                        
+                        # Calculate what the duration would be if it were the same day
+                        $sameDayDuration = $endDateTime.TimeOfDay - $startDateTime.TimeOfDay
+                        if ($sameDayDuration.TotalSeconds -lt 0)
+                        {
+                            $sameDayDuration = $sameDayDuration.Add([TimeSpan]::FromDays(1))
+                        }
+                        
+                        if ($startHour -ge 6 -and $startHour -le 12 -and 
+                            $endHour -ge 12 -and $endHour -le 18 -and
+                            $sameDayDuration.TotalHours -ge 4 -and $sameDayDuration.TotalHours -le 12)
+                        {
+                            # Correct the end date to be the same as start date but keep the time
+                            $correctedEndDate = $startDateTime.Date.Add($endDateTime.TimeOfDay)
+                            $rawEndDate = $correctedEndDate.ToString("yyyy-MM-ddTHH:mm:ssZ")
+                            Write-PSFMessage -Level Verbose -Message "Corrected single-day event: EndDate changed from $endDateTime to $correctedEndDate for item $($item.Id) (Duration: $($sameDayDuration.TotalHours) hours)"
+                        }
+                    }
+                }
+                catch
+                {
+                    Write-PSFMessage -Level Verbose -Message "Failed to parse dates for single-day event detection on item $($item.Id): $($_.Exception.Message)"
+                }
+            }
+
             # Extract event times from location
             $location = Get-SafeFieldValue -Fields $fields -FieldName $FieldMappings.Location
             $eventTimes = Get-EventTime -LocationString $location
@@ -64,8 +108,8 @@
                 Id           = $item.Id
                 Subject      = $subject
                 Description  = $cleanDescription
-                StartDate    = Format-DateTime -DateTimeString $rawStartDate
-                EndDate      = Format-DateTime -DateTimeString $rawEndDate
+                StartDate    = Format-DateTime -DateTimeString $rawStartDate -PreserveDateOnly
+                EndDate      = Format-DateTime -DateTimeString $rawEndDate -PreserveDateOnly
                 StartTime    = $eventTimes.StartTime
                 EndTime      = $eventTimes.EndTime
                 Location     = $location

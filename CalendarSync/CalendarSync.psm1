@@ -1,8 +1,31 @@
-# CalendarSync PowerShell Module
+#requires -Version 5.1
+#requires -Module PSFramework
+
+# CalendarSync PowerShell Module v1.0
 # Synchronizes calendar events between Microsoft Graph API and SharePoint lists
 
-# Get module root path
+# Get module and project root paths
 $ModuleRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
+$ProjectRoot = Split-Path -Parent $ModuleRoot
+
+# Load default configuration from project root (before functions that might need it)
+$DefaultConfigPath = Join-Path $ProjectRoot "DefaultConfig.ps1"
+if (Test-Path $DefaultConfigPath)
+{
+    try
+    {
+        . $DefaultConfigPath
+        Write-Verbose "Loaded default configuration from: $DefaultConfigPath"
+    }
+    catch
+    {
+        Write-Error "Failed to load default configuration: $($_.Exception.Message)"
+    }
+}
+else
+{
+    Write-Warning "DefaultConfig.ps1 not found at: $DefaultConfigPath"
+}
 
 # Import internal functions (helper functions)
 $InternalFunctions = Get-ChildItem -Path "$ModuleRoot\internal\*.ps1" -ErrorAction SilentlyContinue
@@ -48,5 +71,7 @@ Export-ModuleMember -Function @(
     'Connect-ToMicrosoftGraph',
     'Get-SharePointListItems',
     'ConvertTo-FormattedEvent',
-    'Export-ResultsToJson'
+    'Export-ResultsToJson',
+    'Get-Configuration'
 )
+

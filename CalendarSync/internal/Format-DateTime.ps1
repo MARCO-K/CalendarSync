@@ -11,10 +11,14 @@
         Use short format for output (dd.MM.yy instead of dd.MM.yyyy)
     .PARAMETER Format
         Custom format string (default: dd.MM.yyyy)
+    .PARAMETER PreserveDateOnly
+        When true, preserves the date component without timezone conversion (useful for calendar dates)
     .EXAMPLE
         Format-DateTime -DateTimeString "2025-07-17T09:00:00Z"
     .EXAMPLE
         Format-DateTime -DateTimeString "2025-07-17T09:00:00Z" -ShortFormat
+    .EXAMPLE
+        Format-DateTime -DateTimeString "2025-07-17T23:59:00Z" -PreserveDateOnly
     #>
     [CmdletBinding()]
     [OutputType([string])]
@@ -25,7 +29,9 @@
 
         [switch]$ShortFormat,
 
-        [string]$Format = "dd.MM.yyyy"
+        [string]$Format = "dd.MM.yyyy",
+
+        [switch]$PreserveDateOnly
     )
 
     if ([string]::IsNullOrEmpty($DateTimeString))
@@ -35,7 +41,7 @@
 
     try
     {
-        $dateTime = $null
+        [DateTime]$dateTime = [DateTime]::MinValue
 
         # Handle ISO 8601 format with Z suffix (UTC)
         if ($DateTimeString -match '^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z?$')
@@ -53,8 +59,8 @@
             return $DateTimeString
         }
 
-        # Convert to local time if UTC
-        if ($dateTime.Kind -eq [DateTimeKind]::Utc)
+        # Convert to local time if UTC (unless PreserveDateOnly is specified)
+        if ($dateTime.Kind -eq [DateTimeKind]::Utc -and -not $PreserveDateOnly)
         {
             $dateTime = $dateTime.ToLocalTime()
         }
