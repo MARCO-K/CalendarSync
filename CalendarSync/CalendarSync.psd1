@@ -3,7 +3,7 @@
     RootModule        = 'CalendarSync.psm1'
 
     # Version number of this module.
-    ModuleVersion     = '1.0.1'
+    ModuleVersion     = '1.0.4'
 
     # ID used to uniquely identify this module
     GUID              = 'b9c85b6d-4f6e-4a8d-9c7e-8f1a2b3c4d5e'
@@ -36,7 +36,8 @@
         'Connect-ToMicrosoftGraph',
         'Get-SharePointListItem',
         'ConvertTo-FormattedEvent',
-        'Export-ResultsToJson'
+        'Export-ResultsToJson',
+        'Get-Configuration'
     )
 
     # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
