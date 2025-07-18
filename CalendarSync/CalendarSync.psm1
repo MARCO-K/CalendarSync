@@ -44,9 +44,9 @@ Import-Module PSFramework
 
 # Export only public functions
 Export-ModuleMember -Function @(
-    'Sync-CalendarEvents',
+    'Sync-CalendarEvent',
     'Connect-ToMicrosoftGraph',
     'Get-SharePointListItems',
-    'ConvertTo-FormattedEvents',
+    'ConvertTo-FormattedEvent',
     'Export-ResultsToJson'
 )

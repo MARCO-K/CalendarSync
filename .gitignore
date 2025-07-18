@@ -107,3 +107,4 @@ Session_*.md
 
 # GitHub Specific
 .github/workflows/secrets.yml
+Test-AccountInfo.ps1

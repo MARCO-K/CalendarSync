@@ -6,7 +6,7 @@ $script:DefaultConfig = @{
     }
     DateRange     = @{
         PastDays   = 0      # Start from today (no past events)
-        FutureDays = 7      # Next 7 days (upcoming week)
+        FutureDays = 14      # Next 14 days (upcoming two weeks)
     }
     FieldMappings = @{
         Title       = 'Title'

@@ -1,9 +1,11 @@
-﻿function ConvertTo-FormattedEvent {
+﻿function ConvertTo-FormattedEvent
+{
     <#
     .SYNOPSIS
         Converts SharePoint list items to formatted event objects
     .DESCRIPTION
         Processes SharePoint list items and converts them to standardized event objects with extracted information
+        including trainer and account information
     .PARAMETER Items
         Array of SharePoint list items to process
     .PARAMETER FieldMappings
@@ -23,12 +25,15 @@
 
     $formattedEvents = @()
 
-    foreach ($item in $Items) {
-        try {
+    foreach ($item in $Items)
+    {
+        try
+        {
             $fields = $item.Fields.AdditionalProperties
 
             # Debug output for field discovery
-            if ($DebugMode) {
+            if ($DebugMode)
+            {
                 Write-PSFMessage -Level Debug -Message "Processing Item ID: $($item.Id)"
                 Write-PSFMessage -Level Debug -Message "Available fields: $($fields.Keys -join ', ')"
             }
@@ -49,6 +54,9 @@
             $subject = Get-SafeFieldValue -Fields $fields -FieldName $FieldMappings.Title
             $trainer = Get-TrainerInfo -SubjectString $subject
 
+            # Extract account information from subject
+            $account = Get-AccountInfo -SubjectString $subject
+
             # Determine location type
             $locationType = Get-LocationType -LocationString $location
 
@@ -63,10 +71,12 @@
                 Location     = $location
                 LocationType = $locationType
                 Trainer      = $trainer
+                Account      = $account
             }
 
         }
-        catch {
+        catch
+        {
             Write-PSFMessage -Level Error -Message "Error processing item $($item.Id): $($_.Exception.Message)"
             Write-PSFMessage -Level Debug -Message "Stack trace: $($_.ScriptStackTrace)"
         }
