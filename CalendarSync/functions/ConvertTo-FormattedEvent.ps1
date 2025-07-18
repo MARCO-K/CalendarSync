@@ -52,7 +52,7 @@
 
             # Extract trainer information from subject
             $subject = Get-SafeFieldValue -Fields $fields -FieldName $FieldMappings.Title
-            $trainer = Get-TrainerInfo -SubjectString $subject
+            $trainerInfo = Get-TrainerInfo -SubjectString $subject
 
             # Extract account information from subject
             $account = Get-AccountInfo -SubjectString $subject
@@ -70,7 +70,8 @@
                 EndTime      = $eventTimes.EndTime
                 Location     = $location
                 LocationType = $locationType
-                Trainer      = $trainer
+                Trainer      = $trainerInfo.FullName
+                TrainerId    = $trainerInfo.ID
                 Account      = $account
             }
 
